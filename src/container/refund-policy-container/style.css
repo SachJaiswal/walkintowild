@@ -1,0 +1,5 @@
+.policy-page { max-width: 980px; margin: 40px auto; padding: 0 20px; }
+.policy-title { font-size: 28px; margin: 0 0 12px; color: #0b2e1a }
+.policy-section { margin: 18px 0 }
+.policy-section__heading { font-size: 16px; margin: 0 0 6px; color: #0b2e1a }
+.policy-section__body { color: rgba(0,0,0,0.75); font-size:15px; line-height:1.6 }

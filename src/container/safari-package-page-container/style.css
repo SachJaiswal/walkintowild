@@ -1,0 +1,15 @@
+.sp-container { max-width:1180px; margin: 32px auto; padding: 0 20px }
+.sp-hero { padding: 28px 12px 8px }
+.sp-title-main { font-size:28px; color:#0b2e1a; margin:4px 0 }
+.sp-lead { color: rgba(0,0,0,0.7) }
+
+.sp-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:18px; margin-top:18px }
+.sp-card { background:#fff; border-radius:12px; box-shadow:0 8px 26px rgba(0,0,0,0.06); overflow:hidden }
+.sp-media { height:140px; background: linear-gradient(135deg,#7fd43a33,#0b2e1a); display:flex; align-items:flex-end; padding:10px }
+.sp-park { background:#fff; padding:6px 8px; border-radius:999px; font-weight:700 }
+.sp-body { padding:14px }
+.sp-title { margin:0 0 8px }
+.sp-price { margin:0 0 12px; color:rgba(0,0,0,0.6) }
+.sp-cta { padding:10px 12px; background:#0b2e1a; color:#fff; border:none; border-radius:8px; cursor:pointer }
+
+@media (max-width:900px) { .sp-grid { grid-template-columns: 1fr } }
