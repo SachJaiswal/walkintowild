@@ -2,6 +2,7 @@
 
 import React from "react";
 import "./style.css";
+import Card from "../../components/card";
 
 // Hero Section Component
 const HeroSection = () => {
@@ -92,29 +93,31 @@ const DiscoverSection = () => {
   const deals: Deal[] = [
     {
       id: 1,
-      title: "Wildlife pitstop. - Kanha",
+      title: "Wildlife Marathon - Kanha",
       park: "Kanha Tiger Reserve",
-      nights: "1 Nights, 2 Days",
-      highlight: "1 Private Safari",
-      price: "₹ 20,110 /Person",
+      nights: "4 Nights, 5 Days",
+      highlight: "6 Private Safari",
+      price: "₹ 1,03,640 /Person",
+      tag: "Popular",
+     
     },
     {
       id: 2,
-      title: "Creeks & Crocodiles - Bhitarkanika",
-      park: "Bhitarkanika National Park",
-      nights: "2 Nights, 3 Days",
-      highlight: "Boat Safari",
-      price: "₹ 24,750 /Person",
-      tag: "Best Deal",
+      title: "Dhikala Dry Season",
+      park: "Corbett Tiger Reserve",
+      nights: "4 Nights, 5 Days",
+      highlight: "Seat 1",
+      price: "From ₹ 28,500 /Person",
+      tag: "May 22"
     },
     {
       id: 3,
-      title: "Mangrove Majesty - Bhitarkanika",
-      park: "Bhitarkanika National Park",
-      nights: "3 Nights, 4 Days",
-      highlight: "Boat Safari",
-      price: "₹ 38,750 /Person",
-      tag: "Best Deal",
+      title: "Sunset Safari",
+      park: "Bandhavgarh Tiger Reserve",
+      nights: "3 Nights, 3 Days",
+      highlight: "Seats 5",
+      price: "From ₹ 42,900 /Person",
+      tag: "Jun 22"
     },
   ];
 
@@ -127,37 +130,28 @@ const DiscoverSection = () => {
           rightAction={<button className="link-btn" type="button">View All</button>}
         />
 
-        <div className="deal-grid">
-          {deals.map((d) => (
-            <article key={d.id} className="deal-card">
-              <div className="deal-media" aria-hidden="true">
-                {d.tag ? <span className="deal-tag">{d.tag}</span> : null}
-              </div>
-              <div className="deal-body">
-                <h3 className="deal-title">{d.title}</h3>
-                <p className="deal-park">{d.park}</p>
-
-                <div className="deal-meta">
-                  <div className="meta-chip">
-                    <span className="meta-k">Package Highlight</span>
-                    <span className="meta-v">{d.nights}</span>
-                  </div>
-                  <div className="meta-chip">
-                    <span className="meta-k">Package Highlight</span>
-                    <span className="meta-v">{d.highlight}</span>
-                  </div>
-                </div>
-
-                <div className="deal-bottom">
-                  <div>
-                    <p className="deal-price">{d.price}</p>
-                    <p className="deal-note">Include taxes and fees</p>
-                  </div>
-                  <button className="card-btn" type="button">View Details</button>
-                </div>
-              </div>
-            </article>
-          ))}
+        <div className="discover-layout">
+          <div className="discover-left" aria-hidden>
+            <img src="/image.webp" alt="Safari" style={{ width: '100%', borderRadius: 12, display: 'block' }} />
+          </div>
+          <div className="discover-right">
+            <div className="deal-grid">
+              {deals.map((d, idx) => (
+                <Card
+                  key={d.id}
+                  title={d.title}
+                  park={d.park}
+                  nights={d.nights}
+                  highlight={d.highlight}
+                  price={d.price}
+                  tag={d.tag}
+                  date={d.tag}
+                  seats={idx === 0 ? 6 : idx === 1 ? 1 : 5}
+                  avatars={["/logo.png", "/image.webp", "/logo.png", "/image.webp"]}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
