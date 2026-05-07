@@ -1,5 +1,223 @@
-.policy-page { max-width: 980px; margin: 40px auto; padding: 0 20px; }
-.policy-title { font-size: 28px; margin: 0 0 12px; color: #0b2e1a; }
-.policy-section { margin: 18px 0; }
-.policy-section__heading { font-size: 16px; margin: 0 0 6px; color: #0b2e1a; }
-.policy-section__body { color: rgba(0,0,0,0.75); font-size: 15px; line-height: 1.6; }
+/* Privacy Policy Page - No Spacing, No Border Radius */
+.policy-page-wrapper {
+  width: 100%;
+  margin-top:85px;
+  padding: 0;
+  background: #ffffff;
+}
+
+/* Hero Section - Full width, no margins, no border radius */
+.policy-hero {
+  background: linear-gradient(135deg, #1a3a1a 0%, #0d2a0d 50%, #1a3a1a 100%);
+  width: 100%;
+  margin: 0;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.policy-hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.policy-hero-badge {
+  display: inline-block;
+  background: rgba(255, 193, 7, 0.2);
+  padding: 8px 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #ffc107;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.policy-hero-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #ffffff, #ffc107);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.5px;
+}
+
+.policy-hero-updated {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+/* Content Section - Full width */
+.policy-content {
+  width: 100%;
+  margin: 0;
+  padding: 60px 20px;
+  background: #ffffff;
+}
+
+.policy-content-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* Policy Sections */
+.policy-section {
+  margin-bottom: 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.policy-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.policy-section__heading {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #0b2e1a;
+  margin: 0 0 16px 0;
+  padding: 0;
+}
+
+.policy-section__body {
+  color: #4a5568;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.policy-section__body p {
+  margin: 0 0 16px 0;
+}
+
+.policy-section__body p:last-child {
+  margin-bottom: 0;
+}
+
+.policy-section__body ul {
+  margin: 12px 0 16px 0;
+  padding-left: 24px;
+}
+
+.policy-section__body li {
+  margin-bottom: 8px;
+  color: #4a5568;
+  line-height: 1.6;
+}
+
+.policy-section__body a {
+  color: #1c8027;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(28, 128, 39, 0.3);
+  transition: all 0.3s ease;
+}
+
+.policy-section__body a:hover {
+  color: #0b5e15;
+  border-bottom-color: #0b5e15;
+}
+
+/* Footer Note */
+.policy-footer-note {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+.policy-footer-note p {
+  color: #718096;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.policy-footer-note a {
+  color: #1c8027;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.policy-footer-note a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .policy-hero {
+    padding: 40px 16px;
+  }
+  
+  .policy-hero-title {
+    font-size: 1.8rem;
+  }
+  
+  .policy-hero-badge {
+    font-size: 0.65rem;
+    padding: 6px 16px;
+  }
+  
+  .policy-content {
+    padding: 40px 16px;
+  }
+  
+  .policy-section__heading {
+    font-size: 1.3rem;
+  }
+  
+  .policy-section__body {
+    font-size: 0.95rem;
+  }
+  
+  .policy-section {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .policy-hero {
+    padding: 32px 16px;
+  }
+  
+  .policy-hero-title {
+    font-size: 1.5rem;
+  }
+  
+  .policy-content {
+    padding: 32px 16px;
+  }
+  
+  .policy-section__heading {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+  }
+  
+  .policy-section__body {
+    font-size: 0.9rem;
+  }
+  
+  .policy-section__body ul {
+    padding-left: 20px;
+  }
+  
+  .policy-footer-note {
+    margin-top: 32px;
+    padding-top: 24px;
+  }
+  
+  .policy-footer-note p {
+    font-size: 0.85rem;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .policy-section__body a {
+    transition: none;
+  }
+}

@@ -35,3 +35,45 @@ h1, h2, h3, h4, h5 {
 }
 
 a { color: inherit; text-decoration: underline; }
+/* Add these to your existing globals.css */
+
+/* Ensure the html and body take full height */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans, Arial), Helvetica, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Make sure the main content grows to fill space */
+main {
+  flex: 1 0 auto;
+}
+
+/* Footer stays at bottom */
+footer {
+  flex-shrink: 0;
+}
+
+/* Remove any default margins from sections */
+section, .about-page, .contact-page, .sp-container, .sh-container {
+  margin-top: 0;
+}
+
+/* Ensure containers don't add extra bottom margin */
+.container, .about-container, .sp-container, .sh-container {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
