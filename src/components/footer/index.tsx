@@ -1,103 +1,214 @@
 "use client";
-
-import React from "react";
 import Link from "next/link";
+import { 
+  Compass, 
+  MapPin, 
+  Phone, 
+  Mail,
+  Send,
+  ChevronRight,
+  Clock,
+  Shield,
+  Award,
+  Leaf
+} from "lucide-react";
 import "./style.css";
 
-// ── Instagram Icon ─────────────────────────────────────────────────────────
-const InstagramIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="2" y="2" width="20" height="20" rx="5" stroke="white" strokeWidth="2" />
-    <circle cx="12" cy="12" r="5" stroke="white" strokeWidth="2" />
-    <circle cx="17.5" cy="6.5" r="1.5" fill="white" />
-  </svg>
-);
+const Footer = () => {
+  const currentYear = new Date().getFullYear();
 
-// ── Scroll to top ──────────────────────────────────────────────────────────
-const ScrollTopBtn = () => {
-  const handleClick = () => window.scrollTo({ top: 0, behavior: "smooth" });
-  return (
-    <button className="scroll-top" onClick={handleClick} aria-label="Scroll to top">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 19V5M5 12l7-7 7 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    </button>
-  );
-};
+  const quickLinks = [
+    { label: "Plan Safari", href: "/" },
+    { label: "Safari Packages", href: "/safari-packages" },
+    { label: "Shared Safari", href: "/shared-safari" },
+    { label: "Custom Tours", href: "/custom-tours" },
+  ];
 
-// ── Footer Component ───────────────────────────────────────────────────────
-const Footer: React.FC = () => {
+  const companyLinks = [
+    { label: "About Us", href: "/about" },
+    { label: "Contact Us", href: "/contact" },
+    { label: "Privacy Policy", href: "/privacy-policy" },
+    { label: "Terms & Conditions", href: "/terms" },
+    { label: "Refund Policy", href: "/refund-policy" },
+  ];
+
+  const safariDestinations = [
+    { name: "Masai Mara", country: "Kenya" },
+    { name: "Serengeti", country: "Tanzania" },
+    { name: "Kruger Park", country: "South Africa" },
+    { name: "Chobe", country: "Botswana" },
+  ];
+
   return (
-    <footer className="footer">
-      <div className="footer-body">
-        <div className="footer-grid">
-          <div className="footer-col">
-            <h3 className="col-title">About Us</h3>
-            <p className="col-text">
-              We offer a seamless experience, connecting you with multiple safari tour
-              operators and providing all the essential details you need to make informed
-              decisions about your wildlife safari, all at no cost.
+    <footer className="safari-footer">
+      {/* Background Elements */}
+      <div className="safari-footer-bg">
+        <div className="safari-footer-pattern" aria-hidden="true" />
+        <div className="safari-footer-orb safari-footer-orb-1" aria-hidden="true" />
+        <div className="safari-footer-orb safari-footer-orb-2" aria-hidden="true" />
+      </div>
+
+      {/* Main Footer Content */}
+      <div className="safari-footer-container">
+        {/* Top Section with Logo and Tagline */}
+        <div className="safari-footer-top">
+          <div className="safari-footer-brand">
+            <div className="safari-footer-logo">
+              <Compass size={32} strokeWidth={1.5} className="safari-footer-logo-icon" />
+              <div className="safari-footer-logo-text">
+                <span className="safari-footer-logo-main">Wild<span className="safari-footer-logo-highlight">Safari</span></span>
+                <span className="safari-footer-logo-sub">African Expeditions</span>
+              </div>
+            </div>
+            <p className="safari-footer-tagline">
+              Experience the untamed beauty of Africa with expert-guided safari adventures.
+              Create memories that last a lifetime.
             </p>
-            <p className="col-text">
-              Our shared safari feature connects you with fellow safari enthusiasts,
-              enabling you to form a group and embark on a shared safari adventure together.
-            </p>
-          </div>
-          <div className="footer-col">
-            <h3 className="col-title">Policy</h3>
-            <ul className="link-list">
-              <li><Link href="/privacy-policy" className="footer-link">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="footer-link">Terms &amp; Conditions</Link></li>
-              <li><Link href="/refund-policy" className="footer-link">Refund Policy</Link></li>
-            </ul>
-          </div>
-          <div className="footer-col">
-            <h3 className="col-title">Useful Links</h3>
-            <ul className="link-list">
-              <li><Link href="/about" className="footer-link">About Us</Link></li>
-              <li><Link href="/contact" className="footer-link">Contact us</Link></li>
-              <li><Link href="/faqs" className="footer-link">FAQs</Link></li>
-            </ul>
-          </div>
-          <div className="footer-col">
-            <h3 className="col-title">Contact Info</h3>
-            <p className="contact-row">
-              <strong>Address:</strong> New Delhi, India
-            </p>
-            <p className="contact-row">
-              <strong>Email:</strong>{" "}
-              <a href="mailto:support@walkintothewild.in" className="footer-link">
-                support@walkintothewild.in
-              </a>
-            </p>
-            <div className="social-row">
-              <a
-                href="https://instagram.com/walkintothewild.in"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="social-link"
-                aria-label="Instagram"
-              >
-                <InstagramIcon />
-              </a>
-              <span className="social-handle">walkintothewild.in</span>
+            <div className="safari-footer-badges">
+              <div className="safari-footer-badge">
+                <Award size={16} />
+                <span>10+ Years Experience</span>
+              </div>
+              <div className="safari-footer-badge">
+                <Leaf size={16} />
+                <span>Eco-Friendly Tours</span>
+              </div>
+              <div className="safari-footer-badge">
+                <Shield size={16} />
+                <span>Safety Certified</span>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-      <div className="bottom-bar">
-        <div className="bottom-inner">
-          <div className="brand-badge">
-            <img src="/logo.png" alt="Walk into the Wild" style={{ height: 28, display: 'block' }} />
+
+          {/* Quick Links */}
+          <div className="safari-footer-section">
+            <h3 className="safari-footer-title">
+              <span className="safari-footer-title-icon">✦</span>
+              Quick Links
+            </h3>
+            <ul className="safari-footer-links">
+              {quickLinks.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="safari-footer-link">
+                    <ChevronRight size={14} />
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
-          <p className="credit">
-            DEVELOPED BY CORBIN TECHNOLOGIES PRIVATE LIMITED
-          </p>
-          <div className="copyright-row">
-            <span className="copyright">
-              COPYRIGHT © 2025 | ALL RIGHTS RESERVED
+
+          {/* Safari Destinations */}
+          <div className="safari-footer-section">
+            <h3 className="safari-footer-title">
+              <span className="safari-footer-title-icon">🌍</span>
+              Top Destinations
+            </h3>
+            <ul className="safari-footer-destinations">
+              {safariDestinations.map((destination) => (
+                <li key={destination.name}>
+                  <div className="safari-footer-destination">
+                    <MapPin size={14} className="safari-footer-destination-icon" />
+                    <div>
+                      <span className="safari-footer-destination-name">{destination.name}</span>
+                      <span className="safari-footer-destination-country">{destination.country}</span>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Company Info */}
+          <div className="safari-footer-section">
+            <h3 className="safari-footer-title">
+              <span className="safari-footer-title-icon">🏕️</span>
+              Company
+            </h3>
+            <ul className="safari-footer-links">
+              {companyLinks.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="safari-footer-link">
+                    <ChevronRight size={14} />
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Middle Section with Contact and Newsletter */}
+        <div className="safari-footer-middle">
+          {/* Contact Info */}
+          <div className="safari-footer-contact">
+            <h3 className="safari-footer-title">
+              <span className="safari-footer-title-icon">📞</span>
+              Get in Touch
+            </h3>
+            <div className="safari-footer-contact-info">
+              <div className="safari-footer-contact-item">
+                <Phone size={16} />
+                <span>+254 700 123 456</span>
+              </div>
+              <div className="safari-footer-contact-item">
+                <Mail size={16} />
+                <span>bookings@wildsafari.com</span>
+              </div>
+              <div className="safari-footer-contact-item">
+                <Clock size={16} />
+                <div>
+                  <span>Mon-Fri: 8:00 AM - 8:00 PM</span>
+                  <span>Sat-Sun: 9:00 AM - 6:00 PM (EAT)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Newsletter */}
+          <div className="safari-footer-newsletter">
+            <h3 className="safari-footer-title">
+              <span className="safari-footer-title-icon">✉️</span>
+              Safari Newsletter
+            </h3>
+            <p className="safari-footer-newsletter-desc">
+              Subscribe to receive exclusive offers, wildlife updates, and safari tips.
+            </p>
+            <form className="safari-footer-newsletter-form">
+              <div className="safari-footer-input-group">
+                <input 
+                  type="email" 
+                  placeholder="Your email address" 
+                  className="safari-footer-input"
+                  required
+                />
+                <button type="submit" className="safari-footer-submit">
+                  <Send size={18} />
+                  <span>Subscribe</span>
+                </button>
+              </div>
+            </form>
+            <p className="safari-footer-newsletter-note">
+              No spam. Unsubscribe anytime. We respect your privacy.
+            </p>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="safari-footer-bottom">
+          <div className="safari-footer-bottom-content">
+            <span className="safari-footer-copyright">
+              © {currentYear} WildSafari African Expeditions. All rights reserved.
             </span>
-            <ScrollTopBtn />
+            <div className="safari-footer-payment">
+              <span className="safari-footer-payment-text">Secure Payments</span>
+              <div className="safari-footer-payment-icons">
+                <span>VISA</span>
+                <span>Mastercard</span>
+                <span>PayPal</span>
+                <span>M-Pesa</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

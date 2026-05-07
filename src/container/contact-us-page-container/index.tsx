@@ -81,7 +81,7 @@ const IconFacebook = () => (
 );
 
 // ─────────────────────────────────────────────────────────────────────
-// Form Field component — boxed inputs
+// Form Field component
 // ─────────────────────────────────────────────────────────────────────
 interface FieldProps {
   label: string;
@@ -99,20 +99,21 @@ const FormField: React.FC<FieldProps> = ({
   return (
     <div
       ref={ref as React.Ref<HTMLDivElement>}
-      className={`cu-field${visible ? " visible" : ""}`}
+      className={`contact-field${visible ? " visible" : ""}`}
       style={{ transitionDelay: `${delay}ms` }}
     >
-      <label className="cu-field__label">{label}</label>
+      <label className="contact-field__label">{label}</label>
       {isTextarea ? (
         <textarea
-          className="cu-field__input cu-field__textarea"
+          className="contact-field__input contact-field__textarea"
           placeholder={label}
           value={value}
           onChange={onChange}
+          rows={4}
         />
       ) : (
         <input
-          className="cu-field__input"
+          className="contact-field__input"
           type={type}
           placeholder={label}
           value={value}
@@ -124,7 +125,7 @@ const FormField: React.FC<FieldProps> = ({
 };
 
 // ─────────────────────────────────────────────────────────────────────
-// Info row
+// Info row component
 // ─────────────────────────────────────────────────────────────────────
 interface InfoRowProps {
   icon: React.ReactNode;
@@ -133,27 +134,27 @@ interface InfoRowProps {
   sub: string;
   delay?: number;
 }
+
 const InfoRow: React.FC<InfoRowProps> = ({ icon, label, value, sub, delay = 0 }) => {
   const { ref, visible } = useInView();
   return (
     <div
       ref={ref as React.Ref<HTMLDivElement>}
-      className={`cu-info__row${visible ? " visible" : ""}`}
+      className={`contact-info__row${visible ? " visible" : ""}`}
       style={{ transitionDelay: `${delay}ms` }}
     >
-      <div className="cu-info__icon-box">{icon}</div>
+      <div className="contact-info__icon-box">{icon}</div>
       <div>
-        <p className="cu-info__label">{label}</p>
-        <p className="cu-info__value">{value}</p>
-        <p className="cu-info__sub">{sub}</p>
+        <p className="contact-info__label">{label}</p>
+        <p className="contact-info__value">{value}</p>
+        <p className="contact-info__sub">{sub}</p>
       </div>
     </div>
   );
 };
 
-
 // ─────────────────────────────────────────────────────────────────────
-// Contact form + info panel
+// Main Contact Component
 // ─────────────────────────────────────────────────────────────────────
 const ContactBody: React.FC = () => {
   const [fields, setFields] = useState({
@@ -169,136 +170,181 @@ const ContactBody: React.FC = () => {
     e.preventDefault();
     if (!fields.name.trim() || !fields.email.trim()) return;
     setSubmitted(true);
+    setTimeout(() => {
+      setSubmitted(false);
+      setFields({ name: "", email: "", phone: "", subject: "", message: "" });
+    }, 3000);
   };
 
-  const { ref: tagRef,       visible: tagVis       } = useInView();
-  const { ref: headRef,      visible: headVis      } = useInView();
-  const { ref: formEyeRef,   visible: formEyeVis   } = useInView();
+  const { ref: tagRef, visible: tagVis } = useInView();
+  const { ref: headRef, visible: headVis } = useInView();
+  const { ref: formEyeRef, visible: formEyeVis } = useInView();
   const { ref: formTitleRef, visible: formTitleVis } = useInView();
-  const { ref: btnRef,       visible: btnVis       } = useInView(0.05);
-  const { ref: socialRef,    visible: socialVis    } = useInView();
-  const rightPanelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = rightPanelRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) { el.classList.add("brackets-on"); obs.disconnect(); }
-      },
-      { threshold: 0.08 }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
+  const { ref: btnRef, visible: btnVis } = useInView(0.05);
+  const { ref: socialRef, visible: socialVis } = useInView();
 
   return (
-    <div className="cu-body">
-      <div className="cu-body__inner">
+    <div className="contact-page-wrapper">
+    
 
-        {/* ── LEFT — info ── */}
-        <div className="cu-left">
-          <p
-            ref={tagRef as React.Ref<HTMLParagraphElement>}
-            className={`cu-left__tag${tagVis ? " visible" : ""}`}
-          >
-            Get In Touch
-          </p>
-
-          <h2
-            ref={headRef as React.Ref<HTMLHeadingElement>}
-            className={`cu-left__heading${headVis ? " visible" : ""}`}
-          >
-            Where wildlife
-            <em>meets wonder.</em>
-          </h2>
-          <div className="cu-info__list">
-            <InfoRow icon={<IconPin />}   label="Head Office"    value="New Delhi, India"  sub="Central India Operations"      delay={0}   />
-            <InfoRow icon={<IconPhone />} label="Phone"   value="+91 11 0000 0000"           sub="Mon–Sat, 9AM – 6PM IST"   delay={80}  />
-            <InfoRow icon={<IconMail />}  label="Email" value="support@walkintothewild.in"           sub="Response within 24 hours"  delay={160} />
-          </div>
-
-          <div
-            ref={socialRef as React.Ref<HTMLDivElement>}
-            className={`cu-social${socialVis ? " visible" : ""}`}
-          >
-            <p className="cu-social__label">Follow the Essence</p>
-            <div className="cu-social__icons">
-              <a href="#" className="cu-social__icon" aria-label="Instagram"><IconInstagram /></a>
-              <a href="#" className="cu-social__icon" aria-label="Twitter"><IconTwitter /></a>
-              <a href="#" className="cu-social__icon" aria-label="Facebook"><IconFacebook /></a>
-            </div>
-          </div>
-        </div>
-
-        {/* ── RIGHT — form ── */}
-        <div className="cu-right" ref={rightPanelRef}>
-          <div className="cu-right__inner">
-
+      {/* Contact Body - Full width */}
+      <div className="contact-body">
+        <div className="contact-body__inner">
+          {/* LEFT PANEL - Info */}
+          <div className="contact-left">
             <p
-              ref={formEyeRef as React.Ref<HTMLParagraphElement>}
-              className={`cu-form__eyebrow${formEyeVis ? " visible" : ""}`}
+              ref={tagRef as React.Ref<HTMLParagraphElement>}
+              className={`contact-left__tag${tagVis ? " visible" : ""}`}
             >
-              Contact Us
+              Connect With Us
             </p>
 
             <h2
-              ref={formTitleRef as React.Ref<HTMLHeadingElement>}
-              className={`cu-form__title${formTitleVis ? " visible" : ""}`}
+              ref={headRef as React.Ref<HTMLHeadingElement>}
+              className={`contact-left__heading${headVis ? " visible" : ""}`}
             >
-              Send a Message
+              Ready for your <em>wild adventure?</em>
             </h2>
 
-            {!submitted ? (
-              <>
-                <div className="cu-form">
-                  <div className="cu-form__row">
-                    <FormField label="Full Name"          value={fields.name}    onChange={update("name")}    delay={0}   />
-                    <FormField label="Email Address" type="email" value={fields.email}   onChange={update("email")}   delay={60}  />
-                  </div>
-                  <div className="cu-form__row">
-                    <FormField label="Phone (Optional)" type="tel"  value={fields.phone}   onChange={update("phone")}   delay={120} />
-                    <FormField label="Subject"                       value={fields.subject} onChange={update("subject")} delay={180} />
-                  </div>
-                  <FormField label="Your Message" isTextarea value={fields.message} onChange={update("message")} delay={240} />
-                </div>
+            <div className="contact-info__list">
+              <InfoRow 
+                icon={<IconPin />} 
+                label="Head Office" 
+                value="New Delhi, India" 
+                sub="Central India Operations" 
+                delay={0} 
+              />
+              <InfoRow 
+                icon={<IconPhone />} 
+                label="Phone" 
+                value="+91 11 0000 0000" 
+                sub="Mon–Sat, 9AM – 6PM IST" 
+                delay={80} 
+              />
+              <InfoRow 
+                icon={<IconMail />} 
+                label="Email" 
+                value="support@walkintothewild.in" 
+                sub="Response within 24 hours" 
+                delay={160} 
+              />
+            </div>
 
-                <div
-                  ref={btnRef as React.Ref<HTMLDivElement>}
-                  className={`cu-form__footer${btnVis ? " visible" : ""}`}
-                >
-                  <button className="cu-form__submit" onClick={handleSubmit}>
-                    <span> SEND </span>
-                    <IconSend />
-                  </button>
-                  <p className="cu-form__disclaimer">
-                    Your enquiry is handled with the utmost discretion and care
+            <div
+              ref={socialRef as React.Ref<HTMLDivElement>}
+              className={`contact-social${socialVis ? " visible" : ""}`}
+            >
+              <p className="contact-social__label">Follow the Wild</p>
+              <div className="contact-social__icons">
+                <a href="#" className="contact-social__icon" aria-label="Instagram">
+                  <IconInstagram />
+                </a>
+                <a href="#" className="contact-social__icon" aria-label="Twitter">
+                  <IconTwitter />
+                </a>
+                <a href="#" className="contact-social__icon" aria-label="Facebook">
+                  <IconFacebook />
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT PANEL - Form */}
+          <div className="contact-right">
+            <div className="contact-right__inner">
+              <p
+                ref={formEyeRef as React.Ref<HTMLParagraphElement>}
+                className={`contact-form__eyebrow${formEyeVis ? " visible" : ""}`}
+              >
+                Send a Message
+              </p>
+
+              <h2
+                ref={formTitleRef as React.Ref<HTMLHeadingElement>}
+                className={`contact-form__title${formTitleVis ? " visible" : ""}`}
+              >
+                Let's Plan Your Safari
+              </h2>
+
+              {!submitted ? (
+                <>
+                  <div className="contact-form">
+                    <div className="contact-form__row">
+                      <FormField 
+                        label="Full Name" 
+                        value={fields.name} 
+                        onChange={update("name")} 
+                        delay={0} 
+                      />
+                      <FormField 
+                        label="Email Address" 
+                        type="email" 
+                        value={fields.email} 
+                        onChange={update("email")} 
+                        delay={60} 
+                      />
+                    </div>
+                    <div className="contact-form__row">
+                      <FormField 
+                        label="Phone (Optional)" 
+                        type="tel" 
+                        value={fields.phone} 
+                        onChange={update("phone")} 
+                        delay={120} 
+                      />
+                      <FormField 
+                        label="Subject" 
+                        value={fields.subject} 
+                        onChange={update("subject")} 
+                        delay={180} 
+                      />
+                    </div>
+                    <FormField 
+                      label="Your Message" 
+                      isTextarea 
+                      value={fields.message} 
+                      onChange={update("message")} 
+                      delay={240} 
+                    />
+                  </div>
+
+                  <div
+                    ref={btnRef as React.Ref<HTMLDivElement>}
+                    className={`contact-form__footer${btnVis ? " visible" : ""}`}
+                  >
+                    <button className="contact-form__submit" onClick={handleSubmit}>
+                      <span>SEND MESSAGE</span>
+                      <IconSend />
+                    </button>
+                    <p className="contact-form__disclaimer">
+                      Your enquiry is handled with the utmost discretion and care
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <div className="contact-success">
+                  <div className="contact-success__icon">
+                    <IconCheck />
+                  </div>
+                  <h3 className="contact-success__title">Message Received!</h3>
+                  <p className="contact-success__text">
+                    Thank you, {fields.name.split(" ")[0]}! Our safari experts will respond within 24 hours.
                   </p>
                 </div>
-              </>
-            ) : (
-              <div className="cu-success">
-                <div className="cu-success__icon"><IconCheck /></div>
-                <h3 className="cu-success__title">Message Received</h3>
-                <p className="cu-success__text">
-                  Thank you, {fields.name.split(" ")[0]}. We will be in touch within 24 hours.
-                </p>
-              </div>
-            )}
-
+              )}
+            </div>
           </div>
         </div>
-
       </div>
     </div>
   );
 };
 
 // ─────────────────────────────────────────────────────────────────────
-// Root export
+// Root Export
 // ─────────────────────────────────────────────────────────────────────
 const ContactUsContainer: React.FC = () => (
-  <div className="contact-us-container" id="contact">
+  <div className="contact-us-container">
     <ContactBody />
   </div>
 );
