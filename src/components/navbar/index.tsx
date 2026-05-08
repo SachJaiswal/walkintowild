@@ -221,7 +221,7 @@ const Navbar = () => {
                       <span>Sign In</span>
                     </Link>
                     <Link
-                      href="/register"
+                      href="/create-account"
                       className="safari-dropdown__item safari-dropdown__item--highlight"
                       role="menuitem"
                       onClick={() => setProfileOpen(false)}

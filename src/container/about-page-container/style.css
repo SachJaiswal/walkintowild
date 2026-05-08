@@ -1,7 +1,7 @@
 /* About Us Page - No Spacing, No Border Radius, Mobile Responsive */
 .about-page {
   width: 100%;
-  margin: 0;
+  margin-top:85px;
   padding: 0;
   background: linear-gradient(135deg, #f5f7ed 0%, #e8ede4 100%);
   flex: 1;
