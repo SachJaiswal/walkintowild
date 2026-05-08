@@ -11,7 +11,8 @@ const ThreeBackground = () => {
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!mountRef.current) return;
+    const mountNode = mountRef.current;
+    if (!mountNode) return;
 
     // Setup Scene
     const scene = new THREE.Scene();
@@ -32,7 +33,7 @@ const ThreeBackground = () => {
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
-    mountRef.current.appendChild(renderer.domElement);
+    mountNode.appendChild(renderer.domElement);
 
     // Create Particles (Fireflies/Stars)
     const particleCount = 1500;
@@ -151,8 +152,8 @@ const ThreeBackground = () => {
     // Cleanup
     return () => {
       window.removeEventListener("resize", handleResize);
-      if (mountRef.current && renderer.domElement) {
-        mountRef.current.removeChild(renderer.domElement);
+      if (mountNode.contains(renderer.domElement)) {
+        mountNode.removeChild(renderer.domElement);
       }
       renderer.dispose();
     };
@@ -160,6 +161,13 @@ const ThreeBackground = () => {
 
   return <div ref={mountRef} className="three-background" />;
 };
+
+const heroBackgroundImages = [
+  "/main/image1.jpg",
+  "/main/image2.jpg",
+  "/main/image3.jpg",
+  "/main/image4.jpg",
+];
 
 // Hero Section Component
 const HeroSection = () => {
@@ -170,27 +178,30 @@ const HeroSection = () => {
     vehicle: "",
   });
 
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
   const handleSearch = () => {
     console.log("Searching with params:", searchParams);
   };
 
   return (
     <section className="hero-section">
+      <div className="hero-image-background" aria-hidden="true">
+        {heroBackgroundImages.map((image) => (
+          <span
+            key={image}
+            className="hero-bg-image"
+            style={{ backgroundImage: `url(${image})` }}
+          />
+        ))}
+      </div>
       <ThreeBackground />
       <div className="hero-overlay">
-        <div className={`hero-content ${isVisible ? "visible" : ""}`}>
+        <div className="hero-content visible">
           <p className="hero-eyebrow">✦ Find, plan and share Safaris ✦</p>
           <h1 className="hero-title">
             Your Ultimate Portal to the <span className="hero-highlight">Wild</span>
           </h1>
           <p className="hero-subtitle">
-            Discover safari packages, join shared safaris, and explore India's best parks—built for wildlife enthusiasts.
+            Discover safari packages, join shared safaris, and explore India&apos;s best parks—built for wildlife enthusiasts.
           </p>
 
           <div className="hero-search" role="search" aria-label="Safari search">
@@ -1093,6 +1104,136 @@ const TopParksSection = () => {
     </section>
   );
 };
+// const RareSafarisSection = () => {
+//   const animals = [
+//     { 
+//       name: "Snow Leopard", 
+//       note: "Elusive big cat of the Himalayas. Found at high altitudes between 3,000-4,500 meters. Known as the 'ghost of the mountains' due to its rare sightings.", 
+//       location: "Himalayas",
+//       rarity: "Critically Endangered",
+//       image: "/leopard.jpg"
+//     },
+//     { 
+//       name: "Himalayan Brown Bear", 
+//       note: "A powerful mammal of rugged cold terrain. One of the largest land mammals in the Himalayas, also known as the 'Dzu-Teh'.", 
+//       location: "Himalayas",
+//       rarity: "Vulnerable",
+//       image: "/bear.jpg"
+//     },
+//     { 
+//       name: "Gee's Golden Langur", 
+//       note: "Rare primate with striking golden fur. Found only in Bhutan and Assam. Considered sacred in many regions.", 
+//       location: "Assam",
+//       rarity: "Endangered",
+//       image: "/elephant.jpg"
+//     },
+//     { 
+//       name: "Lion-tailed Macaque", 
+//       note: "Endangered primate of the Western Ghats. Known for its silver-white mane and distinctive tail tuft.",
+//       location: "Western Ghats",
+//       rarity: "Endangered",
+//       image: "/lion.jpg"
+//     },
+//     { 
+//       name: "Malabar Giant Squirrel", 
+//       note: "Colorful arboreal seed disperser. Features vibrant purple, orange, and brown fur. Known for its impressive leaping ability.", 
+//       location: "Western Ghats",
+//       rarity: "Least Concern",
+//       image: "/image.jpg"
+//     },
+//     { 
+//       name: "Red Panda", 
+//       note: "Bamboo lover from the eastern Himalayas. Known for its cute appearance and red fur. Spends most of its time in trees.", 
+//       location: "Eastern Himalayas",
+//       rarity: "Endangered",
+//       image: "/redpanda.jpg"
+//     },
+//   ];
+
+//   const [isVisible, setIsVisible] = useState(false);
+//   const sectionRef = useRef<HTMLElement>(null);
+
+//   useEffect(() => {
+//     const observer = new IntersectionObserver(
+//       ([entry]) => {
+//         if (entry.isIntersecting) {
+//           setIsVisible(true);
+//           observer.disconnect();
+//         }
+//       },
+//       { threshold: 0.1 }
+//     );
+
+//     if (sectionRef.current) {
+//       observer.observe(sectionRef.current);
+//     }
+
+//     return () => observer.disconnect();
+//   }, []);
+
+//   const getRarityColor = (rarity: string) => {
+//     switch(rarity) {
+//       case "Critically Endangered": return "#ff4444";
+//       case "Endangered": return "#ff8800";
+//       case "Vulnerable": return "#ffcc00";
+//       default: return "#1c8027";
+//     }
+//   };
+
+//   return (
+//     <section ref={sectionRef} className={`rare-section ${isVisible ? "visible" : ""}`}>
+//       <div className="container">
+//         <SectionHeader
+//           title="Rare and Exotic"
+//           subtitle="Animal Safaris"
+//           rightAction={
+//             <Link href="/safari-packages" className="link-btn">
+//               View All →
+//             </Link>
+//           }
+//         />
+        
+//         <div className="animals-vertical-grid">
+//           {animals.map((animal, index) => (
+//             <div
+//               key={animal.name}
+//               className="animal-vertical-card"
+//               style={{ animationDelay: `${index * 0.1}s` }}
+//               onClick={() => window.location.href = `/safari-packages?animal=${encodeURIComponent(animal.name)}`}
+//             >
+//               <div className="animal-vertical-image">
+//                 <img src={animal.image} alt={animal.name} />
+//                 <div 
+//                   className="animal-rarity-vertical"
+//                   style={{ backgroundColor: getRarityColor(animal.rarity) }}
+//                 >
+//                   {animal.rarity}
+//                 </div>
+//               </div>
+//               <div className="animal-vertical-content">
+//                 <h3 className="animal-vertical-title">{animal.name}</h3>
+//                 <div className="animal-vertical-location">
+//                   <span className="location-icon">📍</span>
+//                   {animal.location}
+//                 </div>
+//                 <div className="animal-vertical-desc">
+//                   <p>{animal.note}</p>
+//                 </div>
+//                 <div className="animal-vertical-footer">
+//                   <button className="animal-vertical-btn">
+//                     Know More →
+//                   </button>
+//                 </div>
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+//     </section>
+//   );
+// };
+// CTA Section
+
 const RareSafarisSection = () => {
   const animals = [
     { 
@@ -1100,46 +1241,59 @@ const RareSafarisSection = () => {
       note: "Elusive big cat of the Himalayas. Found at high altitudes between 3,000-4,500 meters. Known as the 'ghost of the mountains' due to its rare sightings.", 
       location: "Himalayas",
       rarity: "Critically Endangered",
-      image: "/leopard.jpg"
+      image: "/leopard.jpg",
+      sightings: "< 7,000",
+      bestTime: "Nov - Apr"
     },
     { 
       name: "Himalayan Brown Bear", 
       note: "A powerful mammal of rugged cold terrain. One of the largest land mammals in the Himalayas, also known as the 'Dzu-Teh'.", 
       location: "Himalayas",
       rarity: "Vulnerable",
-      image: "/bear.jpg"
+      image: "/bear.jpg",
+      sightings: "< 500",
+      bestTime: "May - Sep"
     },
     { 
       name: "Gee's Golden Langur", 
       note: "Rare primate with striking golden fur. Found only in Bhutan and Assam. Considered sacred in many regions.", 
       location: "Assam",
       rarity: "Endangered",
-      image: "/elephant.jpg"
+      image: "/elephant.jpg",
+      sightings: "< 2,500",
+      bestTime: "Oct - Mar"
     },
     { 
       name: "Lion-tailed Macaque", 
       note: "Endangered primate of the Western Ghats. Known for its silver-white mane and distinctive tail tuft.",
       location: "Western Ghats",
       rarity: "Endangered",
-      image: "/lion.jpg"
+      image: "/lion.jpg",
+      sightings: "< 4,000",
+      bestTime: "Dec - May"
     },
     { 
       name: "Malabar Giant Squirrel", 
       note: "Colorful arboreal seed disperser. Features vibrant purple, orange, and brown fur. Known for its impressive leaping ability.", 
       location: "Western Ghats",
       rarity: "Least Concern",
-      image: "/image.jpg"
+      image: "/image.jpg",
+      sightings: "Stable",
+      bestTime: "Year Round"
     },
     { 
       name: "Red Panda", 
       note: "Bamboo lover from the eastern Himalayas. Known for its cute appearance and red fur. Spends most of its time in trees.", 
       location: "Eastern Himalayas",
       rarity: "Endangered",
-      image: "/redpanda.jpg"
+      image: "/redpanda.jpg",
+      sightings: "< 10,000",
+      bestTime: "Sep - Nov"
     },
   ];
 
   const [isVisible, setIsVisible] = useState(false);
+  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -1162,56 +1316,99 @@ const RareSafarisSection = () => {
 
   const getRarityColor = (rarity: string) => {
     switch(rarity) {
-      case "Critically Endangered": return "#ff4444";
-      case "Endangered": return "#ff8800";
-      case "Vulnerable": return "#ffcc00";
-      default: return "#1c8027";
+      case "Critically Endangered": return "#dc2626";
+      case "Endangered": return "#f97316";
+      case "Vulnerable": return "#eab308";
+      default: return "#22c55e";
+    }
+  };
+
+  const getRarityBg = (rarity: string) => {
+    switch(rarity) {
+      case "Critically Endangered": return "rgba(220, 38, 38, 0.1)";
+      case "Endangered": return "rgba(249, 115, 22, 0.1)";
+      case "Vulnerable": return "rgba(234, 179, 8, 0.1)";
+      default: return "rgba(34, 197, 94, 0.1)";
     }
   };
 
   return (
-    <section ref={sectionRef} className={`rare-section ${isVisible ? "visible" : ""}`}>
+    <section ref={sectionRef} className={`rare-section-v2 ${isVisible ? "visible" : ""}`}>
       <div className="container">
-        <SectionHeader
-          title="Rare and Exotic"
-          subtitle="Animal Safaris"
-          rightAction={
-            <Link href="/safari-packages" className="link-btn">
-              View All →
-            </Link>
-          }
-        />
+        <div className="rare-header">
+          <div className="rare-header-left">
+            <span className="rare-eyebrow">✦ WILDLIFE SPOTLIGHT ✦</span>
+            <h2 className="rare-title">Rare & Exotic Animals</h2>
+            <p className="rare-subtitle">
+              Discover India's most elusive and endangered wildlife species
+            </p>
+          </div>
+          <Link href="/safari-packages" className="rare-view-all">
+            View All Species
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </Link>
+        </div>
         
-        <div className="animals-vertical-grid">
+        <div className="animals-grid-v2">
           {animals.map((animal, index) => (
             <div
               key={animal.name}
-              className="animal-vertical-card"
+              className={`animal-card-v2 ${hoveredCard === index ? "hovered" : ""}`}
               style={{ animationDelay: `${index * 0.1}s` }}
+              onMouseEnter={() => setHoveredCard(index)}
+              onMouseLeave={() => setHoveredCard(null)}
               onClick={() => window.location.href = `/safari-packages?animal=${encodeURIComponent(animal.name)}`}
             >
-              <div className="animal-vertical-image">
-                <img src={animal.image} alt={animal.name} />
-                <div 
-                  className="animal-rarity-vertical"
-                  style={{ backgroundColor: getRarityColor(animal.rarity) }}
-                >
-                  {animal.rarity}
+              <div className="animal-card-inner">
+                <div className="animal-image-wrapper">
+                  <img src={animal.image} alt={animal.name} />
+                  <div className="animal-image-overlay"></div>
+                  <div 
+                    className="animal-rarity-badge-v2"
+                    style={{ 
+                      background: getRarityColor(animal.rarity),
+                      boxShadow: `0 0 20px ${getRarityColor(animal.rarity)}40`
+                    }}
+                  >
+                    {animal.rarity}
+                  </div>
+                  <div className="animal-sightings">
+                    <span className="sightings-label">Population</span>
+                    <span className="sightings-value">{animal.sightings}</span>
+                  </div>
                 </div>
-              </div>
-              <div className="animal-vertical-content">
-                <h3 className="animal-vertical-title">{animal.name}</h3>
-                <div className="animal-vertical-location">
-                  <span className="location-icon">📍</span>
-                  {animal.location}
-                </div>
-                <div className="animal-vertical-desc">
-                  <p>{animal.note}</p>
-                </div>
-                <div className="animal-vertical-footer">
-                  <button className="animal-vertical-btn">
-                    Know More →
-                  </button>
+                
+                <div className="animal-info-v2">
+                  <div className="animal-header">
+                    <h3 className="animal-name-v2">{animal.name}</h3>
+                    <div className="animal-location-v2">
+                      <span className="location-dot">📍</span>
+                      {animal.location}
+                    </div>
+                  </div>
+                  
+                  <div className="animal-best-time">
+                    <span className="best-time-icon">📅</span>
+                    <span>Best sighting: <strong>{animal.bestTime}</strong></span>
+                  </div>
+                  
+                  <p className="animal-description-v2">{animal.note}</p>
+                  
+                  <div className="animal-actions-v2">
+                    <button className="animal-btn-primary">
+                      Plan Safari
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                        <polyline points="12 5 19 12 12 19" />
+                      </svg>
+                    </button>
+                    <button className="animal-btn-secondary">
+                      Learn More
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1221,7 +1418,6 @@ const RareSafarisSection = () => {
     </section>
   );
 };
-// CTA Section
 const CTASection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
@@ -1256,7 +1452,7 @@ const CTASection = () => {
             <Link href="/custom-tours" className="cta-btn primary">
               Plan Safari
             </Link>
-            <Link href="/contact-us" className="cta-btn secondary">
+            <Link href="/contact" className="cta-btn secondary">
               Contact Us
             </Link>
           </div>
