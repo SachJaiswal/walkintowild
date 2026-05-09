@@ -3,40 +3,168 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useAuth } from "@/src/context/auth-context";
+import { AuthApiError } from "@/src/lib/auth/api";
 import "./style.css";
+
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (options: {
+            client_id: string;
+            callback: (response: { credential?: string }) => void;
+            use_fedcm_for_prompt?: boolean;
+            cancel_on_tap_outside?: boolean;
+          }) => void;
+          prompt: (callback?: (notification: {
+            isNotDisplayed: () => boolean;
+            isSkippedMoment: () => boolean;
+            isDismissedMoment: () => boolean;
+            getNotDisplayedReason: () => string;
+            getSkippedReason: () => string;
+            getDismissedReason: () => string;
+          }) => void) => void;
+        };
+      };
+    };
+  }
+}
+
+const GOOGLE_SCRIPT_ID = "google-identity-services";
 
 const LoginContainer = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { login, googleLogin } = useAuth();
 
   // Form state
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [focused, setFocused] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const getErrorMessage = (err: unknown) => {
+    if (err instanceof AuthApiError || err instanceof Error) {
+      return err.message;
+    }
+
+    return "Something went wrong. Please try again.";
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     if (!emailOrPhone || !password) {
-      setError("Please enter email/phone and password");
+      setError("Please enter email and password");
       return;
     }
 
     setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
-      // For demo, redirect to home page
+
+    try {
+      await login({
+        email: emailOrPhone.trim().toLowerCase(),
+        password,
+      });
+
       const returnTo = searchParams?.get("returnTo") || "/";
       router.push(returnTo);
-    }, 1500);
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadGoogleIdentityScript = () =>
+    new Promise<void>((resolve, reject) => {
+      if (window.google?.accounts?.id) {
+        resolve();
+        return;
+      }
+
+      const existingScript = document.getElementById(GOOGLE_SCRIPT_ID);
+      if (existingScript) {
+        existingScript.addEventListener("load", () => resolve(), { once: true });
+        existingScript.addEventListener("error", () => reject(), { once: true });
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.id = GOOGLE_SCRIPT_ID;
+      script.src = "https://accounts.google.com/gsi/client";
+      script.async = true;
+      script.defer = true;
+      script.onload = () => resolve();
+      script.onerror = () => reject();
+      document.head.appendChild(script);
+    });
+
+  const handleGoogleLogin = async () => {
+    const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+
+    if (!googleClientId) {
+      setError("Google sign-in is not configured yet.");
+      return;
+    }
+
+    setError("");
+    setGoogleLoading(true);
+
+    try {
+      await loadGoogleIdentityScript();
+
+      window.google?.accounts.id.initialize({
+        client_id: googleClientId,
+        use_fedcm_for_prompt: false,
+        cancel_on_tap_outside: true,
+        callback: async ({ credential }) => {
+          if (!credential) {
+            setError("Google did not return an ID token.");
+            setGoogleLoading(false);
+            return;
+          }
+
+          try {
+            await googleLogin(credential);
+            const returnTo = searchParams?.get("returnTo") || "/";
+            router.push(returnTo);
+          } catch (err) {
+            setError(getErrorMessage(err));
+          } finally {
+            setGoogleLoading(false);
+          }
+        },
+      });
+
+      window.google?.accounts.id.prompt((notification) => {
+        if (notification.isDismissedMoment()) {
+          const reason = notification.getDismissedReason();
+          if (reason !== "credential_returned") {
+            setGoogleLoading(false);
+          }
+          return;
+        }
+
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          setGoogleLoading(false);
+          setError(
+            "Google sign-in was blocked or unavailable in this browser. Disable extensions for localhost, then refresh and try again.",
+          );
+        }
+      });
+    } catch {
+      setError("Unable to load Google sign-in. Please try again.");
+      setGoogleLoading(false);
+    }
   };
 
   // Canvas animation effect for jungle particles
@@ -180,9 +308,9 @@ const LoginContainer = () => {
                 <div className="login-input-wrap">
                   <span className="login-input-icon">📧</span>
                   <input
-                    type="text"
+                    type="email"
                     className="login-input"
-                    placeholder="you@example.com or +91 98765 43210"
+                    placeholder="you@example.com"
                     value={emailOrPhone}
                     onChange={(e) => setEmailOrPhone(e.target.value)}
                     onFocus={() => setFocused("emailPhone")}
@@ -241,7 +369,7 @@ const LoginContainer = () => {
             <button
               type="submit"
               className={`login-submit ${loading ? "loading" : ""} ${!emailOrPhone || !password ? "disabled" : ""}`}
-              disabled={loading || !emailOrPhone || !password}
+              disabled={loading || googleLoading || !emailOrPhone || !password}
             >
               {loading ? (
                 <>
@@ -260,7 +388,7 @@ const LoginContainer = () => {
             </button>
 
             <p className="login-switch">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link href="/create-account" className="login-switch-link">
                 Create Account →
               </Link>
@@ -269,13 +397,22 @@ const LoginContainer = () => {
           
           <div className="login-footer">
             <div className="login-social">
-              <button className="login-social-btn" onClick={() => router.push("/")}>
-                🌐 Continue as Guest
+              <button
+                type="button"
+                className="login-social-btn"
+                onClick={handleGoogleLogin}
+                disabled={loading || googleLoading}
+              >
+                {googleLoading ? "Connecting to Google..." : "Continue with Google"}
               </button>
-            </div>
-            <div className="login-demo-credentials">
-              <p>Demo Credentials:</p>
-              <code>demo@wildsafari.com / demo123</code>
+              <button
+                type="button"
+                className="login-social-btn"
+                onClick={() => router.push("/")}
+                disabled={loading || googleLoading}
+              >
+                Continue as Guest
+              </button>
             </div>
           </div>
         </div>

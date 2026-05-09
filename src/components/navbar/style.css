@@ -252,11 +252,38 @@
 
 .safari-avatar-initials {
   background: linear-gradient(135deg, #ffc107, #ff9800);
-  padding: 0.2rem 0.5rem;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   font-size: 0.8rem;
   font-weight: 600;
   color: #1a1a1a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 30px;
+}
+
+.safari-avatar-img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: 0 0 30px;
+  border: 1px solid rgba(255, 193, 7, 0.55);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.safari-avatar-default {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 30px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffc107;
 }
 
 .safari-chevron {

@@ -350,6 +350,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAuth } from "@/src/context/auth-context";
+import { AuthApiError } from "@/src/lib/auth/api";
 import "./style.css";
 
 interface FormData {
@@ -382,6 +384,7 @@ interface FormData {
 
 const CreateAccountContainer = () => {
   const router = useRouter();
+  const { register } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -392,6 +395,14 @@ const CreateAccountContainer = () => {
   const [focused, setFocused] = useState<string | null>(null);
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const getErrorMessage = (err: unknown) => {
+    if (err instanceof AuthApiError || err instanceof Error) {
+      return err.message;
+    }
+
+    return "Something went wrong. Please try again.";
+  };
 
   const [formData, setFormData] = useState<FormData>({
     // Basic Information
@@ -507,48 +518,35 @@ const CreateAccountContainer = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
+
+    if (!validateStep1() || !validateStep2()) {
+      return;
+    }
+
     setLoading(true);
 
-    // Prepare data for API
     const userData = {
-      user_id: `USER_${Date.now()}`,
-      name: formData.name,
-      email: formData.email,
+      name: formData.name.trim(),
+      email: formData.email.trim().toLowerCase(),
       password: formData.password,
-      role: "visitor",
-      mobile: formData.mobile,
-      alternate_mobile: formData.alternate_mobile || undefined,
-      date_of_birth: formData.date_of_birth ? new Date(formData.date_of_birth) : undefined,
+      mobile: formData.mobile.trim() || undefined,
+      date_of_birth: formData.date_of_birth || undefined,
       gender: formData.gender || undefined,
-      address: {
-        line1: formData.address_line1 || undefined,
-        line2: formData.address_line2 || undefined,
-        city: formData.city || undefined,
-        state: formData.state || undefined,
-        pincode: formData.pincode || undefined,
-        country: formData.country || undefined,
-      },
-      emergency_contact: {
-        name: formData.emergency_name || undefined,
-        relationship: formData.emergency_relationship || undefined,
-        mobile: formData.emergency_mobile || undefined,
-      },
       interests: formData.interests.length > 0 ? formData.interests : undefined,
-      status: "active",
-      email_verified: false,
-      mobile_verified: false,
     };
 
-    console.log("Create account payload", userData);
-
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
-      setSuccess("Account created successfully! Redirecting to login...");
-      setTimeout(() => {
+    try {
+      await register(userData);
+      setSuccess("Account created successfully. Redirecting to login...");
+      window.setTimeout(() => {
         router.push("/login");
-      }, 2000);
-    }, 1500);
+      }, 1200);
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Canvas animation effect
