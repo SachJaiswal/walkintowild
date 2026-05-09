@@ -3,9 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { 
   User, 
-  ShoppingBag, 
   LogOut, 
-  Heart, 
   ChevronDown,
   MapPin,
   CalendarDays,
@@ -16,7 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import Image from "next/image";
+import { useAuth } from "@/src/context/auth-context";
 
 import "./style.css";
 
@@ -24,10 +22,11 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
+  const { user, isAuthenticated, logout } = useAuth();
+  const [avatarFailed, setAvatarFailed] = useState(false);
 
   // Navigation items for Safari booking
   const navItems = [
@@ -72,15 +71,21 @@ const Navbar = () => {
   }, []);
 
   const handleLogout = async () => {
-    // Implement your logout logic here
+    await logout();
     setProfileOpen(false);
     router.push("/login");
   };
 
+  const profileImage = user?.profile_picture || user?.profile_image || "";
+
+  useEffect(() => {
+    setAvatarFailed(false);
+  }, [profileImage]);
+
   // Get user initials
   const initials = user
-    ? user.displayName
-      ? user.displayName
+    ? user.name
+      ? user.name
           .split(" ")
           .map((w: string) => w[0])
           .join("")
@@ -147,10 +152,19 @@ const Navbar = () => {
               aria-label="Profile menu"
               aria-expanded={profileOpen}
             >
-              {initials ? (
+              {profileImage && !avatarFailed ? (
+                <img
+                  src={profileImage}
+                  alt={user?.name ? `${user.name}'s profile` : "Profile"}
+                  className="safari-avatar-img"
+                  onError={() => setAvatarFailed(true)}
+                />
+              ) : initials ? (
                 <span className="safari-avatar-initials">{initials}</span>
               ) : (
-                <User size={20} />
+                <span className="safari-avatar-default">
+                  <User size={18} />
+                </span>
               )}
               <ChevronDown
                 size={14}
@@ -167,49 +181,51 @@ const Navbar = () => {
                   </div>
                 </div>
 
-                {user && (
+                {isAuthenticated && user && (
                   <div className="safari-dropdown__user">
                     <span className="safari-dropdown__name">
-                      {user.displayName || "Explorer"}
+                      {user.name || "Explorer"}
                     </span>
                     <span className="safari-dropdown__email">{user.email}</span>
                   </div>
                 )}
 
-                <div className="safari-dropdown__divider" />
+                {isAuthenticated ? (
+                  <>
+                    <div className="safari-dropdown__divider" />
 
-                <Link
-                  href="/profile"
-                  className="safari-dropdown__item"
-                  role="menuitem"
-                  onClick={() => setProfileOpen(false)}
-                >
-                  <User size={14} />
-                  <span>My Profile</span>
-                </Link>
+                    <Link
+                      href="/profile"
+                      className="safari-dropdown__item"
+                      role="menuitem"
+                      onClick={() => setProfileOpen(false)}
+                    >
+                      <User size={14} />
+                      <span>My Profile</span>
+                    </Link>
 
-                <Link
-                  href="/my-bookings"
-                  className="safari-dropdown__item"
-                  role="menuitem"
-                  onClick={() => setProfileOpen(false)}
-                >
-                  <CalendarDays size={14} />
-                  <span>My Bookings</span>
-                </Link>
+                    <Link
+                      href="/my-bookings"
+                      className="safari-dropdown__item"
+                      role="menuitem"
+                      onClick={() => setProfileOpen(false)}
+                    >
+                      <CalendarDays size={14} />
+                      <span>My Bookings</span>
+                    </Link>
 
-                <div className="safari-dropdown__divider" />
+                    <div className="safari-dropdown__divider" />
 
-                <button
-                  className="safari-dropdown__item safari-dropdown__item--danger"
-                  role="menuitem"
-                  onClick={handleLogout}
-                >
-                  <LogOut size={14} />
-                  <span>Logout</span>
-                </button>
-
-                {!user && (
+                    <button
+                      className="safari-dropdown__item safari-dropdown__item--danger"
+                      role="menuitem"
+                      onClick={handleLogout}
+                    >
+                      <LogOut size={14} />
+                      <span>Logout</span>
+                    </button>
+                  </>
+                ) : (
                   <>
                     <Link
                       href="/login"
