@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/src/context/auth-context";
@@ -18,6 +18,18 @@ declare global {
             use_fedcm_for_prompt?: boolean;
             cancel_on_tap_outside?: boolean;
           }) => void;
+          renderButton: (
+            parent: HTMLElement,
+            options: {
+              theme?: "outline" | "filled_blue" | "filled_black";
+              size?: "large" | "medium" | "small";
+              type?: "standard" | "icon";
+              text?: "signin_with" | "signup_with" | "continue_with" | "signin";
+              shape?: "rectangular" | "pill" | "circle" | "square";
+              logo_alignment?: "left" | "center";
+              width?: number;
+            },
+          ) => void;
           prompt: (callback?: (notification: {
             isNotDisplayed: () => boolean;
             isSkippedMoment: () => boolean;
@@ -26,6 +38,7 @@ declare global {
             getSkippedReason: () => string;
             getDismissedReason: () => string;
           }) => void) => void;
+          cancel: () => void;
         };
       };
     };
@@ -42,13 +55,14 @@ const LoginContainer = () => {
   // Form state
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(() => searchParams?.get("error") || "");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [focused, setFocused] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const googleButtonRef = useRef<HTMLDivElement>(null);
 
   const getErrorMessage = (err: unknown) => {
     if (err instanceof AuthApiError || err instanceof Error) {
@@ -108,64 +122,75 @@ const LoginContainer = () => {
       document.head.appendChild(script);
     });
 
-  const handleGoogleLogin = async () => {
-    const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-
-    if (!googleClientId) {
-      setError("Google sign-in is not configured yet.");
+  const handleGoogleCredential = useCallback(async ({ credential }: { credential?: string }) => {
+    if (!credential) {
+      setError("Google did not return an ID token.");
+      setGoogleLoading(false);
       return;
     }
 
-    setError("");
     setGoogleLoading(true);
 
     try {
-      await loadGoogleIdentityScript();
+      await googleLogin(credential);
+      const returnTo = searchParams?.get("returnTo") || "/";
+      router.push(returnTo);
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setGoogleLoading(false);
+    }
+  }, [googleLogin, router, searchParams]);
 
-      window.google?.accounts.id.initialize({
-        client_id: googleClientId,
-        use_fedcm_for_prompt: false,
-        cancel_on_tap_outside: true,
-        callback: async ({ credential }) => {
-          if (!credential) {
-            setError("Google did not return an ID token.");
-            setGoogleLoading(false);
-            return;
-          }
+  useEffect(() => {
+    const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    const buttonContainer = googleButtonRef.current;
 
-          try {
-            await googleLogin(credential);
-            const returnTo = searchParams?.get("returnTo") || "/";
-            router.push(returnTo);
-          } catch (err) {
-            setError(getErrorMessage(err));
-          } finally {
-            setGoogleLoading(false);
-          }
-        },
-      });
+    if (!googleClientId || !buttonContainer) {
+      return;
+    }
 
-      window.google?.accounts.id.prompt((notification) => {
-        if (notification.isDismissedMoment()) {
-          const reason = notification.getDismissedReason();
-          if (reason !== "credential_returned") {
-            setGoogleLoading(false);
-          }
+    let cancelled = false;
+
+    const renderGoogleButton = async () => {
+      try {
+        await loadGoogleIdentityScript();
+
+        if (cancelled || !googleButtonRef.current) {
           return;
         }
 
-        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-          setGoogleLoading(false);
-          setError(
-            "Google sign-in was blocked or unavailable in this browser. Disable extensions for localhost, then refresh and try again.",
-          );
+        window.google?.accounts.id.initialize({
+          client_id: googleClientId,
+          callback: handleGoogleCredential,
+          use_fedcm_for_prompt: true,
+          cancel_on_tap_outside: true,
+        });
+
+        googleButtonRef.current.innerHTML = "";
+        window.google?.accounts.id.renderButton(googleButtonRef.current, {
+          type: "standard",
+          theme: "outline",
+          size: "large",
+          text: "continue_with",
+          shape: "rectangular",
+          logo_alignment: "left",
+          width: Math.min(320, googleButtonRef.current.clientWidth || 320),
+        });
+      } catch {
+        if (!cancelled) {
+          setError("Unable to load Google sign-in. Check browser privacy settings and refresh.");
         }
-      });
-    } catch {
-      setError("Unable to load Google sign-in. Please try again.");
-      setGoogleLoading(false);
-    }
-  };
+      }
+    };
+
+    renderGoogleButton();
+
+    return () => {
+      cancelled = true;
+      window.google?.accounts.id.cancel();
+    };
+  }, [handleGoogleCredential]);
 
   // Canvas animation effect for jungle particles
   useEffect(() => {
@@ -397,14 +422,17 @@ const LoginContainer = () => {
           
           <div className="login-footer">
             <div className="login-social">
-              <button
-                type="button"
-                className="login-social-btn"
-                onClick={handleGoogleLogin}
-                disabled={loading || googleLoading}
-              >
-                {googleLoading ? "Connecting to Google..." : "Continue with Google"}
-              </button>
+              {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? (
+                <div
+                  className={`login-google-button ${loading || googleLoading ? "disabled" : ""}`}
+                  ref={googleButtonRef}
+                  aria-busy={googleLoading}
+                />
+              ) : (
+                <button type="button" className="login-social-btn" disabled>
+                  Google sign-in is not configured
+                </button>
+              )}
               <button
                 type="button"
                 className="login-social-btn"
