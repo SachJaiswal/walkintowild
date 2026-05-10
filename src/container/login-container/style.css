@@ -514,7 +514,21 @@
 .login-social {
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 0;
   margin-bottom: 10px;
+}
+
+.login-google-button {
+  min-width: 220px;
+  min-height: 40px;
+  display: flex;
+  justify-content: center;
+}
+
+.login-google-button.disabled {
+  opacity: 0.55;
+  pointer-events: none;
 }
 
 .login-social-btn {
@@ -598,6 +612,14 @@
   }
   
   .login-social-btn {
+    width: 100%;
+  }
+
+  .login-social {
+    flex-direction: column;
+  }
+
+  .login-google-button {
     width: 100%;
   }
   
