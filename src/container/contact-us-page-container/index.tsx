@@ -1,6 +1,10 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import {
+  ContactApiError,
+  submitContact,
+} from "@/src/lib/contact/api";
 import "./style.css";
 
 // ─────────────────────────────────────────────────────────────────────
@@ -161,19 +165,61 @@ const ContactBody: React.FC = () => {
     name: "", email: "", phone: "", subject: "", message: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const update = (key: string) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       setFields((prev) => ({ ...prev, [key]: e.target.value }));
 
-  const handleSubmit = (e: React.MouseEvent) => {
+  const getErrorMessage = (err: unknown) => {
+    if (err instanceof ContactApiError || err instanceof Error) {
+      return err.message;
+    }
+
+    return "Something went wrong. Please try again.";
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fields.name.trim() || !fields.email.trim()) return;
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
+    setError("");
+    setSuccessMessage("");
+
+    if (!fields.name.trim() || !fields.email.trim() || !fields.subject.trim() || !fields.message.trim()) {
+      setError("Name, email, subject and message are required.");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email.trim())) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    if (fields.message.trim().length < 10) {
+      setError("Message must be at least 10 characters.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const result = await submitContact({
+        full_name: fields.name.trim(),
+        email: fields.email.trim().toLowerCase(),
+        phone: fields.phone.trim() || undefined,
+        subject: fields.subject.trim(),
+        message: fields.message.trim(),
+      });
+
+      setSuccessMessage(result.message);
+      setSubmitted(true);
       setFields({ name: "", email: "", phone: "", subject: "", message: "" });
-    }, 3000);
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const { ref: tagRef, visible: tagVis } = useInView();
@@ -263,11 +309,11 @@ const ContactBody: React.FC = () => {
                 ref={formTitleRef as React.Ref<HTMLHeadingElement>}
                 className={`contact-form__title${formTitleVis ? " visible" : ""}`}
               >
-                Let's Plan Your Safari
+                Let&apos;s Plan Your Safari
               </h2>
 
               {!submitted ? (
-                <>
+                <form onSubmit={handleSubmit} noValidate>
                   <div className="contact-form">
                     <div className="contact-form__row">
                       <FormField 
@@ -308,19 +354,21 @@ const ContactBody: React.FC = () => {
                     />
                   </div>
 
+                  {error && <p className="contact-form__error">{error}</p>}
+
                   <div
                     ref={btnRef as React.Ref<HTMLDivElement>}
                     className={`contact-form__footer${btnVis ? " visible" : ""}`}
                   >
-                    <button className="contact-form__submit" onClick={handleSubmit}>
-                      <span>SEND MESSAGE</span>
+                    <button className="contact-form__submit" type="submit" disabled={isSubmitting}>
+                      <span>{isSubmitting ? "SENDING..." : "SEND MESSAGE"}</span>
                       <IconSend />
                     </button>
                     <p className="contact-form__disclaimer">
                       Your enquiry is handled with the utmost discretion and care
                     </p>
                   </div>
-                </>
+                </form>
               ) : (
                 <div className="contact-success">
                   <div className="contact-success__icon">
@@ -328,8 +376,18 @@ const ContactBody: React.FC = () => {
                   </div>
                   <h3 className="contact-success__title">Message Received!</h3>
                   <p className="contact-success__text">
-                    Thank you, {fields.name.split(" ")[0]}! Our safari experts will respond within 24 hours.
+                    {successMessage || "Thank you. Our safari experts will respond within 24 hours."}
                   </p>
+                  <button
+                    className="contact-success__button"
+                    type="button"
+                    onClick={() => {
+                      setSubmitted(false);
+                      setSuccessMessage("");
+                    }}
+                  >
+                    Send Another Message
+                  </button>
                 </div>
               )}
             </div>

@@ -464,6 +464,12 @@
   transform: translateY(-2px);
 }
 
+.contact-form__submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+}
+
 .contact-form__submit svg {
   width: 16px;
   height: 16px;
@@ -479,6 +485,18 @@
   font-weight: 300;
   color: var(--text-dim);
   text-align: center;
+}
+
+.contact-form__error {
+  margin: 18px 0 0;
+  border: 1px solid rgba(255, 92, 92, 0.34);
+  background: rgba(255, 92, 92, 0.1);
+  color: #ffb3a9;
+  font-family: var(--font-body);
+  font-size: 0.86rem;
+  font-weight: 500;
+  line-height: 1.5;
+  padding: 12px 14px;
 }
 
 /* Success State - No border radius */
@@ -521,6 +539,26 @@
   font-weight: 300;
   color: var(--text-dim);
   line-height: 1.6;
+}
+
+.contact-success__button {
+  margin-top: 24px;
+  border: 1px solid var(--primary-border);
+  background: var(--primary-faint);
+  color: var(--primary);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  padding: 12px 18px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.contact-success__button:hover {
+  border-color: var(--primary);
+  background: rgba(255, 193, 7, 0.18);
 }
 
 /* Animations */
